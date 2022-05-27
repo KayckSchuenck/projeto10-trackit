@@ -1,11 +1,13 @@
 import logo from "./assets/logo.svg"
 import styled from "styled-components"
 import { Link,useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useState,useContext } from "react"
 import axios from "axios"
 import { ThreeDots } from "react-loader-spinner"
+import UserContext from './usercontext';
 
 export default function TelaLogin() {
+const {usuario,setUsuario} = useContext(UserContext);
 const [email,setEmail]=useState("")
 const [password,setpassword]=useState("")
 const [loading,setLoading]=useState(false)
@@ -19,14 +21,19 @@ const navigate=useNavigate()
     function handleSubmit(e){
         e.preventDefault()
         setLoading(true)
-
         const loginPost={
             email:email,
             password:password
         }
         
         const promise=axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/login",loginPost)
-        promise.then(()=>navigate('/hoje'))
+        promise.then((element)=>{
+            setUsuario({...usuario,
+            token:element.data.token,
+            image:element.data.image
+            });
+            navigate('/hoje')
+        })
         promise.catch(erro=>{
             alert(`Erro ${erro.response.status}, tente novamente`);
             setLoading(false)

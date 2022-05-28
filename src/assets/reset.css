@@ -48,3 +48,6 @@ button{
 	border: 0px;
 	cursor: pointer;
 }
+*focus{
+	outline: none;
+}

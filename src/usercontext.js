@@ -1,5 +1,4 @@
 import { createContext } from 'react';
-
 const UserContext = createContext();
-
-export default UserContext;
+const PercentageContext=createContext();
+export {UserContext,PercentageContext}

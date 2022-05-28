@@ -1,6 +1,6 @@
-import UserContext from './usercontext';
-import ListarHabitos from './listarhabitos';
-import { useState,useContext } from "react"
+import  { UserContext,PercentageContext } from './usercontext';
+import ListarHabitosHoje from './listarhabitoshoje';
+import { useContext } from "react"
 import styled from "styled-components"
 import { Link } from "react-router-dom"
 import { CircularProgressbar } from 'react-circular-progressbar';
@@ -8,7 +8,9 @@ import 'react-circular-progressbar/dist/styles.css';
 
 export default function TelaHoje() {
     const {usuario,setUsuario}=useContext(UserContext)
-    const percentage = 75;
+    const {percentageBar,setPercentageBar} = useContext(PercentageContext)
+    console.log(percentageBar)
+    const percentage=((percentageBar.doneHabits/percentageBar.numHabits)*100).toFixed(0)
     const config={
         headers:{
             Authorization: `Bearer ${usuario.token}`
@@ -16,65 +18,33 @@ export default function TelaHoje() {
     }
     return(
         <>
-        <Header>
+        <header>
            TrackIt <img src={usuario.image}/>
-        </Header>
-        <Conteudo>
-            <span>Dia de hoje</span>
-            Nenhum Habito concluido ainda
-            <ListarHabitos config={config}/>
-        </Conteudo>
+        </header>
+        <div className='conteudo'>
+            <Container percentage={percentageBar}>
+                <span>Dia de hoje</span>
+                <p>{(percentageBar.doneHabits>0 ? `${percentage}% dos hábitos concluídos` : `Nenhum hábito concluído ainda`)}</p>
+                <MeusHabitos>
+                <ListarHabitosHoje config={config} usuario={usuario} setUsuario={setUsuario} setPercentage={setPercentageBar} percentage={percentageBar}/>
+                </MeusHabitos>
+            </Container>
+        </div>
         <ProgressBar>
             <CircularProgressbar  styles={{text:{fontSize:18,fill:"white"},trail:{stroke:'#52B6FF'},path:{stroke:'white'}}} value={percentage} text={`Hoje`} />
         </ProgressBar>
-        <Footer>
+        <footer>
             <Link to="/habitos">
             Hábitos
             </Link>
             <Link to="/historico">
             Histórico
             </Link>
-        </Footer>
+        </footer>
         </>
     )
 }
-const Header=styled.header`
-width: 100%;
-height: 70px;
-position: fixed;
-top: 0;
-left: 0;
-padding: 0 18px;
-display: flex;
-justify-content: space-between;
-align-items: center;
-font-family:'Playball', cursive;
-font-size: 40px;
-color: white;
-background-color: #126BA5;
-box-shadow: 0px 4px 4px 0px #00000026;
-img {
-width: 50px;
-height: 50px;
-border-radius: 50%;
-}`
 
-const Footer=styled.footer`
-position:fixed;
-left: 0;
-bottom:0;
-width: 100%;
-height: 70px;
-padding: 0 36px;
-display: flex;
-align-items: center;
-justify-content: space-between;
-font-size: 18px;
-background-color: white;
-a{
-    text-decoration: none;
-    color: #52B6FF;
-}`
 
 const ProgressBar=styled.div`
 position: fixed;
@@ -88,17 +58,15 @@ background-color: #52B6FF;
 display: flex;
 justify-content: center;
 align-items: center;
-padding: 6px;
+padding: 6px;`
+
+const Container=styled.div`
+color:${props=>props.percentage>0 ? '#8FC549' : '#BABABA'};
 `
-const Conteudo=styled.div`
-margin: 100px 18px;
+
+const MeusHabitos=styled.div`
 display: flex;
 flex-direction: column;
-justify-content: center;
-color: #BABABA;
-font-size: 18px;
-span{
-    color:#126BA5;
-    font-size: 22px;
-}
+color:#666666;
+margin-top: 28px;
 `

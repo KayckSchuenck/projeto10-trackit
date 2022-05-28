@@ -4,10 +4,11 @@ import { Link,useNavigate } from "react-router-dom"
 import { useState,useContext } from "react"
 import axios from "axios"
 import { ThreeDots } from "react-loader-spinner"
-import UserContext from './usercontext';
+import {UserContext,PercentageContext} from './usercontext';
 
 export default function TelaLogin() {
 const {usuario,setUsuario} = useContext(UserContext);
+const {percentageBar,setPercentageBar} = useContext(PercentageContext);
 const [email,setEmail]=useState("")
 const [password,setpassword]=useState("")
 const [loading,setLoading]=useState(false)

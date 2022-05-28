@@ -5,23 +5,27 @@ import './assets/reset.css'
 import './assets/style.css'
 import TelaLogin from './telalogin';
 import TelaCadastro from './telacadastro'
-import UserContext from './usercontext';
+import {UserContext,PercentageContext} from './usercontext';
 import TelaHoje from './telahoje'
 import { useState } from 'react/';
+import TelaHabitos from './telahabitos';
 
 function App(){
     const [usuario,setUsuario]=useState({})
+    const [percentageBar,setPercentageBar]=useState({})
     return(
         <UserContext.Provider value={{usuario,setUsuario}}>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<TelaLogin />} />
-                    <Route path="/cadastro" element={<TelaCadastro />} />
-                    <Route path="/hoje" element={<TelaHoje />}/>
-                {/*  <Route path="/habitos" element={<TelaHabitos />} />
-                    <Route path="/historico" element={<TelaHistorico />}/> */}
-                </Routes>
-            </BrowserRouter>
+            <PercentageContext.Provider value={{percentageBar,setPercentageBar}}>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<TelaLogin />} />
+                        <Route path="/cadastro" element={<TelaCadastro />} />
+                        <Route path="/hoje" element={<TelaHoje />}/>
+                        <Route path="/habitos" element={<TelaHabitos />} />
+                        {/*  <Route path="/historico" element={<TelaHistorico />}/> */}
+                    </Routes>
+                </BrowserRouter>
+            </PercentageContext.Provider>
         </UserContext.Provider>
     )
 }

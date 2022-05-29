@@ -22,9 +22,9 @@ export default function TelaHoje() {
            TrackIt <img src={usuario.image}/>
         </header>
         <div className='conteudo'>
-            <Container percentage={percentageBar}>
+            <Container percentage={percentage}>
                 <span>Dia de hoje</span>
-                <p>{(percentageBar.doneHabits>0 ? `${percentage}% dos hábitos concluídos` : `Nenhum hábito concluído ainda`)}</p>
+                <p>{(percentage>0 ? `${percentage}% dos hábitos concluídos` : `Nenhum hábito concluído ainda`)}</p>
                 <MeusHabitos>
                 <ListarHabitosHoje config={config} usuario={usuario} setUsuario={setUsuario} setPercentage={setPercentageBar} percentage={percentageBar}/>
                 </MeusHabitos>
@@ -61,7 +61,9 @@ align-items: center;
 padding: 6px;`
 
 const Container=styled.div`
-color:${props=>props.percentage>0 ? '#8FC549' : '#BABABA'};
+p{
+    color:${props=>props.percentage>0 ? '#8FC549' : '#BABABA'};
+}
 `
 
 const MeusHabitos=styled.div`

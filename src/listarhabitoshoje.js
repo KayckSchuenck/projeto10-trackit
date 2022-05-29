@@ -6,14 +6,14 @@ export default function ListarHabitosHoje(props) {
     const body=""
     const [habitos,setHabitos]=useState("")
     useEffect(()=>{
-        const promise=axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/todayy`,props.config)
-        promise.then((response)=>alert(`Erro ${response.error}, tente novamente`))
-        promise.catch((response)=>
-                setHabitos([{name:"rato",currentSequence:1,highestSequence:2,done:true},{name:"rato",currentSequence:2,highestSequence:2,done:false},{name:"rato",currentSequence:1,highestSequence:2,done:false}]))
+        const promise=axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/today`,props.config)
+        promise.catch((response)=>alert(`Erro ${response.error}, tente novamente`))
+        promise.then((response)=>{
+                setHabitos(response.data)
                 props.setPercentage({
-                    numHabits:3,
-                    doneHabits:1
-                })
+                    numHabits:response.data.length,
+                    doneHabits:response.data.filter((obj)=>obj.done===true).length
+                })})
     },[])
         
         if(habitos.length===0) return (<div>loading</div>)
@@ -21,6 +21,7 @@ export default function ListarHabitosHoje(props) {
             return (
             <>
             {habitos.map(element=>{
+                console.log(habitos)
                 return(
                     <MeuHabito done={element.done}>
                     <Block sequence={element.currentSequence} record={element.highestSequence} done={element.done}>
@@ -34,14 +35,32 @@ export default function ListarHabitosHoje(props) {
                             const promise=axios.post(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${element.id}/uncheck`,element,props.config);
                             promise.then(()=>{
                                 element.done=!element.done;
+                                props.setPercentage((obj)=>{
+                                    const objeto={
+                                    numHabits:obj.numHabits,
+                                    doneHabits:obj.doneHabits-1
+                                    }
+                                        return objeto
+                                    })
+                                setHabitos([...habitos])
                             })
+                           
                         } else{
                             const promise=axios.post(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${element.id}/check`,element,props.config);
                             promise.then(()=>{
                                 element.done=!element.done;
+                                console.log(element.done)
+                                props.setPercentage((obj)=>{
+                                    const objeto={
+                                    numHabits:obj.numHabits,
+                                    doneHabits:obj.doneHabits+1
+                                    }
+                                        return objeto
+                                    })
                             })
+                            
                         }
-                        setHabitos([...habitos])
+                        
                     }}>
                     </ion-icon>
                     </MeuHabito>

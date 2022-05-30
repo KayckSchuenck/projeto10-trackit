@@ -10,26 +10,52 @@ import axios from "axios"
 import TodosDias from './todosdias';
 
 export default function TelaHabitos() {
-    const {usuario,setUsuario}=useContext(UserContext)
-    const {percentageBar,setPercentageBar} = useContext(PercentageContext)
+    const { usuario }=useContext(UserContext)
+    const { percentageBar,setPercentageBar } = useContext(PercentageContext)
     const percentage=((percentageBar.doneHabits/percentageBar.numHabits)*100).toFixed(0)
     const [name,setName]=useState("")
     const [days,setDays]=useState("")
     const [salvarHabito,setSalvarHabito]=useState(false)
+    const [listaHabitos,setListaHabitos]=useState("")
     const diasSemana=['D','S','T','Q','Q','S','S']
     const config={
         headers:{
             Authorization: `Bearer ${usuario.token}`
         }
     }
+    function atualizarBarra(){
+        const promise = axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/today`,config)
+        promise.catch((error) => alert(`Erro ${error.response.status} tente novamente`))
+        promise.then((response) => {
+            setPercentageBar(obj=>{
+                const objeto = {
+                    numHabits: response.data.length,
+                    doneHabits: obj.doneHabits
+                }
+                return objeto
+            })
+        })
+    }
+    function getHabitos(){
+        const promise=axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits`,config)
+        promise.then((response)=>setListaHabitos(response.data))
+        promise.catch((error)=>alert(`Erro ${error.response.status}, tente novamente`))
+    }
     function salvar(){
         const post={
             name:name,
             days:days
         }
-    const promise=axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits",post,config)
+        const promise=axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits",post,config)
+        promise.then(()=>{
+            setName("")
+            setDays("")
+            setSalvarHabito(false)
+            getHabitos()
+            atualizarBarra()
+        })
+        promise.catch((error)=>alert(`Erro ${error.response.status}, tente novamente`))
     }
-
 
     return(
         <>
@@ -40,22 +66,24 @@ export default function TelaHabitos() {
                 {(salvarHabito ? (
                     <SalvarHabito>
                         <Block>
-                            <input placeholder='nome do habito'/>
+                            <input placeholder='nome do habito' value={name} onChange={(e)=>setName(e.target.value)}/>
                             <Flex2>
-                            {diasSemana.map((elemento)=><TodosDias elemento={elemento}/>)}
+                                {diasSemana.map((elemento,index)=>
+                                <TodosDias days={days} set={setDays} diasSelecionados={[]} key={index} index={index} elemento={elemento}/>)}
                             </Flex2>
                         </Block>
                         <Botoes>
                             <button onClick={()=>setSalvarHabito(false)}>Cancelar</button>
-                            <button onClick={salvarHabito}>Salvar</button>
+                            <button onClick={salvar}>Salvar</button>
                         </Botoes>
                     </SalvarHabito>
                 ) : null)}
+
                 <Flex>
                 <span>Meus Hábitos</span>
                 <img src={plus} onClick={()=>setSalvarHabito(true)}/>
                 </Flex>
-                <TodosHabitos dias={diasSemana} config={config}/>
+                <TodosHabitos listaHabitos={listaHabitos} setListaHabitos={setListaHabitos} getHabitos={getHabitos} atualizarBarra={atualizarBarra} dias={diasSemana} config={config}/>
         </div>
         <ProgressBar>
             <Link to='/hoje'>
@@ -63,9 +91,9 @@ export default function TelaHabitos() {
             </Link>
         </ProgressBar>
         <footer>
-            <Link to="/habitos">
+            <a>
             Hábitos
-            </Link>
+            </a>
             <Link to="/historico">
             Histórico
             </Link>
@@ -118,8 +146,7 @@ input{
 }
 input::placeholder{
     color:#DBDBDB;
-}
-`
+}`
 
 const Botoes=styled.div`
 display: flex;
@@ -140,8 +167,8 @@ button:nth-child(2){
     width: 85px;
     border-radius: 5px;
     font-size: 16px;
-}
-`
+}`
+
 const Block=styled.div`
 `
 const Flex2=styled.div`

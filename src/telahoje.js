@@ -5,11 +5,19 @@ import styled from "styled-components"
 import { Link } from "react-router-dom"
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import dayjs from 'dayjs';
 
 export default function TelaHoje() {
+    require('dayjs/locale/pt-br')
+    let now=dayjs().locale('pt-br').format('dddd, D/MM')
+    function CapitalizeDay(str) {
+        str = str.replace("-feira", '')
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+    now=CapitalizeDay(now)
+    
     const {usuario,setUsuario}=useContext(UserContext)
     const {percentageBar,setPercentageBar} = useContext(PercentageContext)
-    console.log(percentageBar)
     const percentage=((percentageBar.doneHabits/percentageBar.numHabits)*100).toFixed(0)
     const config={
         headers:{
@@ -23,7 +31,7 @@ export default function TelaHoje() {
         </header>
         <div className='conteudo'>
             <Container percentage={percentage}>
-                <span>Dia de hoje</span>
+                <span>{now}</span>
                 <p>{(percentage>0 ? `${percentage}% dos hábitos concluídos` : `Nenhum hábito concluído ainda`)}</p>
                 <MeusHabitos>
                 <ListarHabitosHoje config={config} usuario={usuario} setUsuario={setUsuario} setPercentage={setPercentageBar} percentage={percentageBar}/>

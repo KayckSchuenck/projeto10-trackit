@@ -9,6 +9,7 @@ import {UserContext,PercentageContext} from './usercontext';
 import TelaHoje from './telahoje'
 import { useState } from 'react/';
 import TelaHabitos from './telahabitos';
+import TelaHistorico from './telahistorico';
 
 function App(){
     const [usuario,setUsuario]=useState({})
@@ -20,9 +21,9 @@ function App(){
                     <Routes>
                         <Route path="/" element={<TelaLogin />} />
                         <Route path="/cadastro" element={<TelaCadastro />} />
-                        <Route path="/hoje" element={<TelaHoje />}/>
+                        <Route path="/hoje" element={<TelaHoje />} />
                         <Route path="/habitos" element={<TelaHabitos />} />
-                        {/*  <Route path="/historico" element={<TelaHistorico />}/> */}
+                        <Route path="/historico" element={<TelaHistorico />} />
                     </Routes>
                 </BrowserRouter>
             </PercentageContext.Provider>

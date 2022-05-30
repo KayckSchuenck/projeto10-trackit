@@ -1,10 +1,20 @@
 import styled from "styled-components"
-import { useState } from "react"
+import { useState } from "react";
 
 export default function TodosDias(props) {
-    const [selecionado,setSelecionado]=useState(false)
+    const diasSelecionados=props.diasSelecionados.some((element)=>element===props.index)
+    const [selecionado,setSelecionado]=useState(diasSelecionados)
+    function select(){
+        setSelecionado(!selecionado)
+        if(selecionado) {
+            props.set(props.days.filter((element)=>element!==props.index))
+        }
+        else {
+            props.set([...props.days,props.index])
+        }
+    }
     return(
-            <Dias selecionado={selecionado} onClick={()=>setSelecionado(!selecionado)}>
+            <Dias selecionado={selecionado} onClick={select}>
                 {props.elemento}
             </Dias>
     )

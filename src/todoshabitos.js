@@ -1,32 +1,41 @@
-import { useState,useEffect } from 'react';
+import { useEffect } from 'react';
 import axios from 'axios';
 import styled from 'styled-components'
 import TodosDias from './todosdias';
-export default function TodosHabitos(props) {
-    const [listaHabitos,setListaHabitos]=useState("")
-    useEffect(()=>{
-        const promise=axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits`,props.config)
-        promise.then((response)=>setListaHabitos(response.data))
-    },[])
-    if(listaHabitos.length===0) return (<span style={{color:"#666666"}}>Você não tem nenhum hábito cadastrado ainda. Adicione um hábito para começar a trackear!</span>)
-    else{
-        return (
-        <>
-        {listaHabitos.map(element=>{
-            return (
-                <Habitos>
-                    <Block>
-                        <p>{element.name}</p>
-                        <Flex>
-                            {props.dias.map((elemento)=><TodosDias elemento={elemento}/>)}
-                        </Flex>
-                    </Block>
-                    <ion-icon name="trash-outline"></ion-icon>
-                </Habitos>
-            )
 
-        })}
-        </>
+export default function TodosHabitos(props) {
+    useEffect(()=>{
+        props.getHabitos()
+    },[])
+
+    function apagarHabito(id){
+        const promise=axios.delete(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}`,props.config)
+        promise.then(()=>{
+            props.getHabitos()
+            props.atualizarBarra()
+        })
+        promise.catch((error)=>alert(`Erro ${error.response.status}, tente novamente`))
+    }
+
+    if(props.listaHabitos.length===0) return (<span style={{color:"#666666"}}>Você não tem nenhum hábito cadastrado ainda. Adicione um hábito para começar a trackear!</span>)
+    else {
+        return (
+            <>
+            {props.listaHabitos.map(element=>{
+                return (
+                    <Habitos key={element.index}>
+                        <Block>
+                            <p>{element.name}</p>
+                            <Flex>
+                                {props.dias.map((elemento,index)=>
+                                <TodosDias elemento={elemento} index={index} diasSelecionados={element.days}/>)}
+                            </Flex>
+                        </Block>
+                        <ion-icon name="trash-outline" onClick={()=>apagarHabito(element.id)}></ion-icon>
+                    </Habitos>
+                )
+            })}
+            </>
         )
     }
 }
@@ -49,6 +58,7 @@ justify-content: space-between;
 padding: 10px 10px 15px 15px;
 ion-icon{
     font-size: 15px;
+    cursor: pointer;
 }
 `
 const Flex=styled.div`

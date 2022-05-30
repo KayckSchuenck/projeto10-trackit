@@ -15,7 +15,7 @@ export default function TelaHabitos() {
     const percentage=((percentageBar.doneHabits/percentageBar.numHabits)*100).toFixed(0)
     const [name,setName]=useState("")
     const [days,setDays]=useState("")
-    const [salvarHabito,setSalvarHabito]=useState(false)
+    const [salvarTela,setSalvarTela]=useState(false)
     const [listaHabitos,setListaHabitos]=useState("")
     const diasSemana=['D','S','T','Q','Q','S','S']
     const config={
@@ -42,19 +42,23 @@ export default function TelaHabitos() {
         promise.catch((error)=>alert(`Erro ${error.response.status}, tente novamente`))
     }
     function salvar(){
-        const post={
-            name:name,
-            days:days
+        if(name===""||days==="") {
+            alert("Preencha o nome e marque ao menos um dia")
+        } else {
+            const post={
+                name:name,
+                days:days
+            }
+            const promise=axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits",post,config)
+            promise.then(()=>{
+                setName("")
+                setDays("")
+                setSalvarTela(false)
+                getHabitos()
+                atualizarBarra()
+            })
+            promise.catch((error)=>alert(`Erro ${error.response.status}, tente novamente`))
         }
-        const promise=axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits",post,config)
-        promise.then(()=>{
-            setName("")
-            setDays("")
-            setSalvarHabito(false)
-            getHabitos()
-            atualizarBarra()
-        })
-        promise.catch((error)=>alert(`Erro ${error.response.status}, tente novamente`))
     }
 
     return(
@@ -63,7 +67,7 @@ export default function TelaHabitos() {
            TrackIt <img src={usuario.image}/>
         </header>
         <div className='conteudo'>
-                {(salvarHabito ? (
+                {(salvarTela ? (
                     <SalvarHabito>
                         <Block>
                             <input placeholder='nome do habito' value={name} onChange={(e)=>setName(e.target.value)}/>
@@ -73,7 +77,7 @@ export default function TelaHabitos() {
                             </Flex2>
                         </Block>
                         <Botoes>
-                            <button onClick={()=>setSalvarHabito(false)}>Cancelar</button>
+                            <button onClick={()=>setSalvarTela(false)}>Cancelar</button>
                             <button onClick={salvar}>Salvar</button>
                         </Botoes>
                     </SalvarHabito>
@@ -81,7 +85,7 @@ export default function TelaHabitos() {
 
                 <Flex>
                 <span>Meus Hábitos</span>
-                <img src={plus} onClick={()=>setSalvarHabito(true)}/>
+                <img src={plus} onClick={()=>setSalvarTela(true)}/>
                 </Flex>
                 <TodosHabitos listaHabitos={listaHabitos} setListaHabitos={setListaHabitos} getHabitos={getHabitos} atualizarBarra={atualizarBarra} dias={diasSemana} config={config}/>
         </div>

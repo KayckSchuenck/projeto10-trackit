@@ -1,10 +1,10 @@
 import logo from "./assets/logo.svg"
 import styled from "styled-components"
 import { Link,useNavigate } from "react-router-dom"
-import { useState,useContext } from "react"
+import { useState,useContext,useEffect } from "react"
 import axios from "axios"
 import { ThreeDots } from "react-loader-spinner"
-import {UserContext } from './usercontext';
+import { UserContext } from './usercontext';
 
 export default function TelaLogin() {
 const {usuario,setUsuario} = useContext(UserContext);
@@ -12,6 +12,22 @@ const [email,setEmail]=useState("")
 const [password,setpassword]=useState("")
 const [loading,setLoading]=useState(false)
 const navigate=useNavigate()
+
+    useEffect(()=>{
+        if(localStorage.getItem("login")!==null){
+            setLoading(true)
+            const loginPost=JSON.parse(localStorage.getItem("login"))
+            const promise=axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/login",loginPost)
+            .then((element)=>{
+                setUsuario({...usuario,
+                token:element.data.token,
+                image:element.data.image
+                });
+                navigate('/hoje')
+            })
+            .catch(()=>(alert("Dados não recuperados, faça login novamente"),setLoading(false)))
+        }
+    },[])
 
     function clearInputs(){
         setEmail("")
@@ -25,13 +41,14 @@ const navigate=useNavigate()
             email:email,
             password:password
         }
-        
         const promise=axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/login",loginPost)
         promise.then((element)=>{
             setUsuario({...usuario,
             token:element.data.token,
             image:element.data.image
             });
+            const dadosSerializados = JSON.stringify(loginPost)
+            localStorage.setItem("login",dadosSerializados)
             navigate('/hoje')
         })
         promise.catch(erro=>{
@@ -44,6 +61,7 @@ const navigate=useNavigate()
     return (
         <Tela>
             <img src={logo} />
+
             <Form $loading={loading} onSubmit={handleSubmit}>
                 <input type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required/>
                 <input type="password" placeholder="Senha" value={password} onChange={e=>setpassword(e.target.value)} required/>
@@ -53,11 +71,12 @@ const navigate=useNavigate()
                     </button> ) 
                     : 
                     (<button type="submit">Entrar</button>) )}
-               
             </Form>
+
             <Link to="/cadastro">
             Não tem uma conta? Cadastre-se!
             </Link>
+
         </Tela>
     )
 }

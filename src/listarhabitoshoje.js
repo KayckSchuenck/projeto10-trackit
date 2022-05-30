@@ -1,6 +1,7 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
 import styled from "styled-components"
+import loading from './assets/loading.svg'
 
 export default function ListarHabitosHoje(props) {
     const [habitos, setHabitos] = useState("")
@@ -16,7 +17,7 @@ export default function ListarHabitosHoje(props) {
         })
     }, [])
 
-    if (habitos.length === 0) return (<div>loading</div>)
+    if (habitos.length === 0) return (<div><img src={loading} style={{width:275}}/></div>)
     else {
         return (
             <>
